@@ -1,0 +1,25 @@
+{
+  "name": "OKCoin Price",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description":"OK Coin显示价格。",
+  "permissions": [
+    "tabs", "http://*/*","https://*/*", "contextMenus", "storage", "notifications"
+  ],
+  "icons": {"128": "img/icon_128.jpg",
+			"16": "img/icon_16.jpg",
+			"48": "img/icon_48.jpg"
+  },
+  "browser_action": {
+      "default_title": "OK Coin显示价格",
+	  "default_icon" : "img/icon_128.jpg"
+  },
+ "background": { "scripts": [ "js/jquery.js","js/background.js"] },
+  "content_scripts" :[{
+		"run_at":"document_end",
+		"matches":["http://www.okcoin.com/*","https://www.okcoin.com/*"],
+		"js":["js/jquery.js", "js/templet.js","js/main.js"],
+        "css":["css/bootstrap.css","css/okcoin.css"]
+    }],
+  "web_accessible_resources":["img/x.png","img/apple_icon.png","css/okcoin.css","css/bootstrap.css","img/glyphicons-halflings.png","img/glyphicons-halflings-white.png"]
+}
