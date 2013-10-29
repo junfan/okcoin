@@ -19,10 +19,10 @@ OKCoin自己的里面做的不够好的地方，详情请看Feature List
 1.  克隆本项目菜单，或者下载zip包程序，然后解压缩到本地
 2.  在chrome中打开`设置`，然后选择`扩展程序`
 3.  选择`加载正在开发的扩展程序`，选择src目录
-4.  重新打开okcoin交易界面
+4.  重新打开okcoin交易界面，或者刷新页面
 
 ##PS
-1.  目前只会在http://www.okcoin.com/buy.do，和http://www.okcoin.com/sell.do两个页面有效
+1.  目前只会在<http://www.okcoin.com/buy.do>，和<http://www.okcoin.com/sell.do>两个页面有效
 2.  有朋友在https页面下面打开的时候出错，具体问题还未知，不知道是否是安全问题
-
+3.  如果想做比特币交易的同学，可以通过这个URL<http://www.okcoin.com/?invite=3246397>加入，这样也会给我增加0.001比特币，谢谢：）
 
