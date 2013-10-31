@@ -349,7 +349,18 @@ var Modules={
 
     Modules.regist(moduleName,{
         checker:function(){
-            return location.href.indexOf("www.okcoin.com/buy.do")>=0 || location.href.indexOf("www.okcoin.com/sell.do")>=0;
+            var urls=[
+                "www.okcoin.com/buy.do",
+                "www.okcoin.com/trade/buy.do",
+                "www.okcoin.com/sell.do",
+                "www.okcoin.com/trade/sell.do"
+            ];
+            for(var i=0;i<urls.length;i++){
+                if(location.href.indexOf(urls[i])>=0){
+                    return true;
+                }
+            }
+            return false;
         },
         init:function(){
             var body=[
