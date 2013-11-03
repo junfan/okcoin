@@ -30,11 +30,11 @@ var Modules={
 
 (function(){
     var Maps={
-        "769期货":"http://z.btc123.com/lib/jsonProxyTickerInfo.php?type=796futuresTicker",
-        "mt.gox":"http://z.btc123.com/lib/jsonProxyTickerInfo.php?type=MtGoxTicker",
-        "btcchina":"http://z.btc123.com/lib/jsonProxyTickerInfo.php?type=btcchinaTicker",
-        "cnbtc":"http://z.btc123.com/lib/jsonProxyTickerInfo.php?type=chbtcTicker",
-        "火币":"http://z.btc123.com/lib/jsonProxyTickerInfo.php?type=huobiTicker"
+        "769期货":"http://www.btc123.com/e/interfaces/tickers.php?type=796futuresTicker",
+        "mt.gox":"http://www.btc123.com/e/interfaces/tickers.php?type=MtGoxTicker",
+        "btcchina":"http://www.btc123.com/e/interfaces/tickers.php?type=btcchinaTicker",
+        "cnbtc":"http://www.btc123.com/e/interfaces/tickers.php?type=chbtcTicker",
+        "火币":"http://www.btc123.com/e/interfaces/tickers.php?type=huobiTicker"
     }
 
     function getTradeInfo(){
