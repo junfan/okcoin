@@ -107,6 +107,13 @@ var Modules={
         lastPrice(key,price);
     }
 
+    var doller2rmb_ratio=6.11;
+
+
+    function d2r(p){
+        return parseInt(p*doller2rmb_ratio)
+    }
+
     function getTradeInfoByKey(key){
         var TREND_TIMEOUT=3000;
         var url=Maps[key];
@@ -121,7 +128,7 @@ var Modules={
             if(key!="mt.gox"){
                 var price= resp.ticker.last - 0
                 if(key=="769期货"){
-                    span.text("$"+price).css("background","#d7e3bc");
+                    span.text("$"+price+" R:"+d2r(price)).css("background","#d7e3bc");
                 }
                 else{
                     span.text(price).css("background","#d7e3bc")
@@ -131,9 +138,9 @@ var Modules={
             }
             else{
                 if(resp.result=="success"){
-                    var price=resp.data.last.display;
+                    var price=resp.data.last.display.replace(",","")
                     var iprice =  price.replace("$","")-0
-                    span.text(price)
+                    span.text(price+" R:"+d2r(iprice))
                     trendKey(trend,iprice,key);
                     blink(span);
                 }

@@ -1,7 +1,7 @@
 .tradecon {font-size:14px;position:absolute;right:0px;top:220px;width:220px;border:1px solid gray; padding:5px;}
 .tradepop li {margin:10px;}
 .tradepop li .label {width:50px;display:inline-block;}
-.tradepop li .value {color:red;width:60px;display:inline-block;margin-left:10px;}
+.tradepop li .value {color:red;width:100px;display:inline-block;margin-left:10px;}
 .notify table {width:220px;}
 .notify table input {width:50px;}
 .notify table select {width:70px;line-height:24px;height:24px;}
