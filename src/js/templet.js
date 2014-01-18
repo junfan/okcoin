@@ -57,7 +57,7 @@
     var regSecTag = /\{([#^\/?])([\d\w\.\%\$\+\-\*\/=\>\<=!?@\"\']+)\}/gm,
 
         //匹配属性的正则表达式
-        regFieldTag = /\{([\d\w\$]+|@idx([\%\+-]\d+)?)((?:\|[\w]+)*)\}/gm,
+        regFieldTag = /\{([\d\w\$]+|(\d+[\%\+-])?@idx([\%\+-]\d+)?)((?:\|[\w]+)*)\}/gm,
 
 
         toString = Object.prototype.toString,
@@ -374,7 +374,7 @@
                 segStr.push(tplseg.substr(lastIndex, match.index - lastIndex))
             }
 
-            if (match[1].indexOf("@idx") == 0 && idx !== undefined) {
+            if (match[1].indexOf("@idx") >= 0 && idx !== undefined) {
                 segStr.push(applyFilters(eval(match[1].replace("@idx", idx)), match[3], obj))
             } else if (match[1] == "$") {
                 if (nullOrUndef(obj)) {

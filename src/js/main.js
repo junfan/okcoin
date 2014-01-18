@@ -30,21 +30,21 @@ var Modules={
 
 (function(){
     var Maps={
-        "769期货":"http://www.btc123.com/e/interfaces/tickers.php?type=796futuresTicker",
+        "769":"http://www.btc123.com/e/interfaces/tickers.php?type=796futuresTicker",
         "mt.gox":"http://www.btc123.com/e/interfaces/tickers.php?type=MtGoxTicker",
-        "btcchina":"http://www.btc123.com/e/interfaces/tickers.php?type=btcchinaTicker",
+        "btcc":"http://www.btc123.com/e/interfaces/tickers.php?type=btcchinaTicker",
         "cnbtc":"http://www.btc123.com/e/interfaces/tickers.php?type=chbtcTicker",
         "火币":"http://www.btc123.com/e/interfaces/tickers.php?type=huobiTicker"
     }
 
-    function getTradeInfo(){
+    function getBtcTradeInfo(){
         for(var i in Maps){
-            getLiByKey(i);
+            getBtcLiByKey(i);
         }
-        getTradeInfoImpl();
+        getBtcTradeInfoImpl();
     }
 
-    function getLiByKey(key){
+    function getBtcLiByKey(key){
         var li=$("#id_trade_info_pop").find("li[data-type='"+key+"']")
         if(li.length==0){
             $("#id_trade_info_pop").append('<li data-type="'+key+'"><span class="label">'+key+'</span><span class="value"></span><span data-type="icon" ></span></li>')
@@ -63,45 +63,47 @@ var Modules={
     }
 
 
-    var lastPriceStore={};
+    /**
+     *  btc last price for every market
+     */
+    var btcMarketLastPrice={};
 
     /**
-     *
      */
     function lastPrice(key,value){
         if(typeof value =="undefined"){
-            return lastPrice[key]
+            return btcMarketLastPrice[key]
         }
         else{
-            lastPrice[key]=value
+            btcMarketLastPrice[key]=value
         }
     }
 
-    function removeTrend(v){
+    function removePriceTrend(v){
         v.removeClass("icon-arrow-up").removeClass("icon-arrow-down")
     }
 
-    function trendUp(v){
+    function priceTrendUp(v){
         v.removeClass("icon-arrow-up").removeClass("icon-arrow-down").addClass("icon-arrow-up")
     }
 
-    function trendDown(v){
+    function priceTrendDown(v){
         v.removeClass("icon-arrow-up").removeClass("icon-arrow-down").addClass("icon-arrow-down")
     }
 
-    function trendKey(trend,price,key){
+    function setMarketPriceTrend(trend,price,key){
         var lprice=lastPrice(key);
         if(lprice){
             lprice = lprice - 0
             price = price - 0
             if(lprice == price){
-                removeTrend(trend);
+                removePriceTrend(trend);
             }
             else if(price<lprice){
-                trendDown(trend)
+                priceTrendDown(trend)
             }
             else if(price>lprice){
-                trendUp(trend);
+                priceTrendUp(trend);
             }
         }
         lastPrice(key,price);
@@ -122,32 +124,32 @@ var Modules={
             dataType: "json",
             url: url
         }).done(function(resp){
-            var li=getLiByKey(key)
+            var li=getBtcLiByKey(key)
             var span=li.find("span.value")
             var trend=li.find("span[data-type=icon]")
             if(key!="mt.gox"){
                 var price= resp.ticker.last - 0
-                if(key=="769期货"){
+                if(key=="769"){
                     span.text("$"+price+" R:"+d2r(price)).css("background","#d7e3bc");
                 }
                 else{
                     span.text(price).css("background","#d7e3bc")
                 }
                 blink(span);
-                trendKey(trend,price,key);
+                setMarketPriceTrend(trend,price,key);
             }
             else{
                 if(resp.result=="success"){
                     var price=resp.data.last.display.replace(",","")
                     var iprice =  price.replace("$","")-0
                     span.text(price+" R:"+d2r(iprice))
-                    trendKey(trend,iprice,key);
+                    setMarketPriceTrend(trend,iprice,key);
                     blink(span);
                 }
                 else{
                     span.text("获取失败")
                     blink(span);
-                    removeTrend(trend)
+                    removePriceTrend(trend)
                 }
             }
             setTimeout(function(){
@@ -160,14 +162,14 @@ var Modules={
             var trend=li.find("span[data-type=icon]")
             span.text("获取失败")
             blink(span);
-            removeTrend(trend)
+            removePriceTrend(trend)
             setTimeout(function(){
                 getTradeInfoByKey(key);
             },TREND_TIMEOUT);
         });
     }
 
-    function getTradeInfoImpl(){
+    function getBtcTradeInfoImpl(){
         for(var i in Maps){
             getTradeInfoByKey(i);
         }
@@ -175,6 +177,9 @@ var Modules={
 
     var moduleName="okcoin_pop";
 
+    /**
+     * 初始化密码，不用重复输入
+     */
     function initTradePass(){
         setTimeout(function(){
             sendGetPassMsg();
@@ -206,28 +211,25 @@ var Modules={
         var price=$("#tradeCnyPrice");
         price.unbind("blur").blur(function(){
             var pwd=$("#tradePwd");
-            if(location.href.indexOf("buy.do")>=0 && price.val()>$("#bannerBtcLast").text()){
-                var conf=confirm("是否确定高于当前价格买入？")
-                if(conf){
-                    pwd.val(pass);
-                }
-                else{
-                    pwd.val("");
-                }
+            var currentPrice = location.href.indexOf("ltc.do")? $("#bannerLtcLast").text() : $("#bannerBtcLast").text()
+            var sellType= location.href.indexOf("tradeType=1")>=0 ;
+
+            if((!sellType) && price.val()>currentPrice){
+                tipsAlert("是否确定高于当前价格买入？")
+                pwd.val(pass);
             }
-            else if(location.href.indexOf("sell.do")>=0 && price.val()<$("#bannerBtcLast").text()){
-                var conf=confirm("是否确定低于当前成交价格卖出？")
-                if(conf){
-                    pwd.val(pass);
-                }
-                else{
-                    pwd.val("");
-                }
+            if(sellType && price.val()<currentPrice){
+                tipsAlert("是否确定低于当前成交价格卖出？")
+                pwd.val(pass);
             }
             else{
                 pwd.val(pass);
             }
         })
+    }
+
+    function tipsAlert(s){
+        $("#tradeCnyPrice").fadeOut(500).fadeIn(200)
     }
 
     function promptPassSet(){
@@ -241,6 +243,9 @@ var Modules={
         }
     }
 
+    /**
+     * 从后台拿到pass之后的处理
+     */
     function onBgPassGet(pass,deny){
         if(deny){
             return;
@@ -256,17 +261,6 @@ var Modules={
     var FuncHtmlTemplet=[
         '<li data-action="setpass" class="btn">设置密码</li>'
     ];
-
-    /**
-     * 超过多少预警
-     *
-     * direct: "up"
-     * price : 1000
-     *
-     */
-    function setNotifyPair(direct,price){
-    }
-
 
     /**
      * 从后台获取到notify然后展示
@@ -332,7 +326,34 @@ var Modules={
         });
     }
 
+    function initLtcAskBide(objs){
+        var div= $(".coinBoxBody ul.orderlist")
+        console.log(334);
+        objs.lastprice = lastLtcPrice();
+        var html=[
+            '        {#asks}',
+            '        <li class="red"><span class="c1 height-35">卖 ({10-@idx})</span><span class="c2 height-35">{0}</span><span class="c3 height-35">Ł{1}</span></li>',
+            '        {/asks}',
+            '        {#bids}',
+            '        <li class="lightgreen5"><span class="c1 height-35">买 ({@idx+1})</span><span class="c2 height-35">{0}</span><span class="c3 height-35">Ł{1}</span></li>',
+            '        {/bids}',
 
+            '        <li class="center"><span class="black bold fontsize">最新成交价:</span> <span class="lightorange1 fontsize">{lastprice}</span></li>',
+        ]
+
+        var tpl=new Templet(html.join(""))
+        div.html(tpl.render(objs))
+    }
+
+    function lastLtcPrice(val){
+        var div= $(".coinBoxBody ul.orderlist")
+        if(typeof val=="undefined"){
+            return div.find("li.center").find("span.lightorange1").text()
+        }
+        else{
+            div.find("li.center").find("span.lightorange1").text(val)
+        }
+    }
 
     function initPriceNotify(){
         setInterval(function(){
@@ -354,13 +375,72 @@ var Modules={
             });
     }
 
-    Modules.regist(moduleName,{
+    /**
+     * 开启自动刷新
+     */
+    function delayRefreshLtc(){
+        $("div.buyonesellone").css("height","650px")
+        setTimeout(refreshLtcPrice,800)
+    }
+
+    function delayRefreshLtcLastPrice(){
+        setTimeout(refreshLtcLastPrice,800)
+    }
+
+    function refreshLtcLastPrice(){
+        var url = "http://www.okcoin.com/api/trades.do?symbol=ltc_cny"
+        $.ajax({
+            type:"GET",
+            dataType: "json",
+            url: url
+        }).done(function(resp){
+            lastLtcPrice(resp[0].price)
+            delayRefreshLtcLastPrice()
+        }).fail(function(err){
+            delayRefreshLtcLastPrice()
+        })
+    }
+
+    function refreshLtcPrice(){
+        var url="https://www.okcoin.com/api/depth.do?symbol=ltc_cny"
+        $.ajax({
+            type:"GET",
+            dataType: "json",
+            url: url
+        }).done(function(resp){
+            //console.log(resp)
+            var asktotal=resp.asks.length
+            var bidstotal=resp.bids.length
+            var COUNT=10
+            var obj={asks: resp.asks.slice(asktotal-COUNT),bids: resp.bids.slice(0,COUNT)}
+            console.log(419);
+            //设置第三档价位为卖价格
+            //
+            var sellType= location.href.indexOf("tradeType=1")>=0 ;
+            if (sellType){
+                //第三档价格卖
+                var price =  resp.asks.slice(asktotal-3)[0][0]
+                //$("#tradeCnyPrice").val(price)
+            }
+            else{
+                var price =  resp.bids[3][0]
+                //第三档价格买
+                //$("#tradeCnyPrice").val(price)
+            }
+            initLtcAskBide(obj);
+            delayRefreshLtc()
+        }).fail(function(){
+            delayRefreshLtc()
+            console.log("获取行情信息失败")
+        });
+    }
+
+    Modules.regist("okcoin_btc",{
+
         checker:function(){
             var urls=[
-                "www.okcoin.com/buy.do",
-                "www.okcoin.com/trade/buy.do",
-                "www.okcoin.com/sell.do",
-                "www.okcoin.com/trade/sell.do"
+                "www.okcoin.com/btc.do",
+                "www.okcoin.com/trade/btc.do",
             ];
             for(var i=0;i<urls.length;i++){
                 if(location.href.indexOf(urls[i])>=0){
@@ -369,6 +449,7 @@ var Modules={
             }
             return false;
         },
+
         init:function(){
             var body=[
                 '<div class="tradecon">',
@@ -382,10 +463,41 @@ var Modules={
             ];
             $("body").append(body.join(''));
             addFuncBtn();
-            getTradeInfo();
+            getBtcTradeInfo();
             initTradePass();
-            initPriceNotify();
-            //onBgNotifyGet();
+            sendGetNotifyPairMsg()
+        },
+
+        handler:function(msg,sender,senderResp){
+            if(msg.type=="getpass"){
+                onBgPassGet(msg.pass,msg.deny);
+            }
+            else if(msg.type=="getnotify"){
+                onBgNotifyGet(msg.notifys);
+            }
+        }
+        
+    })
+
+    Modules.regist(moduleName,{
+        checker:function(){
+            var urls=[
+                "www.okcoin.com/ltc.do",
+                "www.okcoin.com/trade/ltc.do",
+            ];
+            for(var i=0;i<urls.length;i++){
+                if(location.href.indexOf(urls[i])>=0){
+                    return true;
+                }
+            }
+            return false;
+        },
+        init:function(){
+            initTradePass();
+            if(location.href.indexOf("ltc.do")>=0){
+                delayRefreshLtc()
+                delayRefreshLtcLastPrice()
+            }
             sendGetNotifyPairMsg()
         },
         handler:function(msg,sender,senderResp){
@@ -393,7 +505,6 @@ var Modules={
                 onBgPassGet(msg.pass,msg.deny);
             }
             else if(msg.type=="getnotify"){
-                console.log(378);
                 onBgNotifyGet(msg.notifys);
             }
         }
